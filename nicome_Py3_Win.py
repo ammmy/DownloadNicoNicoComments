@@ -12,7 +12,6 @@ def read_xml(path):
     return ET.fromstring(codecs.open(path, 'r+', 'utf-8').read())
 
 def extract_data(root):
-    date = [r.attrib['date'] for r in root if 'date' in r.attrib]
     date, vpos, text = [], [], []
     for r in root:
         if 'date' in r.attrib:

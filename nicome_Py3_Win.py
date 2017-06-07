@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+# download niconico comments
 # for Python3 on Windows
 
 import xml.etree.ElementTree as ET

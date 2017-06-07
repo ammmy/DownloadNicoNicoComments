@@ -1,4 +1,5 @@
 # read comment xml files and extract, process, save data
+# Python2
 
 import os
 import numpy as np

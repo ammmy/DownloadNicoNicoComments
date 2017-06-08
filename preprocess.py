@@ -15,24 +15,34 @@ def read_xml(path):
     return ET.fromstring(open(path, 'r').read())
 
 def extract_data(root):
-    date, vpos, text = [], [], []
+    d = {k:[] for k in ['date', 'no', 'vpos', 'text']}# unixtime, number, 1 / 100 sec
     for r in root:
         if 'date' in r.attrib:
-            date.append(int(r.attrib['date'])) # unixtime
-            vpos.append(int(r.attrib['vpos'])) # 1 / 100 sec
-            text.append(r.text)
-    return date, vpos, text
+            for k in d.keys():
+                if k == 'text':
+                    d[k].append(r.text)
+                else:
+                    d[k].append(int(r.attrib[k])) 
+    return d
+
+def uniq_by_key(data, k='no'):
+    d = {n: i for i, n in enumerate(data[k])}
+    uniq_data = {k:[] for k in data.keys()}
+    for i in d.values():
+        for k in data.keys():
+            uniq_data[k].append(data[k][i])
+    return uniq_data
 
 def load_all_comments(comment_path):
     comment_file_name = os.listdir(comment_path)
-    date, vpos, text = [], [], []
+    data = {k:[] for k in ['date', 'no', 'vpos', 'text']}
     for name in comment_file_name:
         xml = read_xml(comment_path + name)
-        _date, _vpos, _text = extract_data(xml)
-        date.extend(_date)
-        vpos.extend(_vpos)
-        text.extend(_text)
-    return date, vpos, text
+        _data = extract_data(xml)
+        for k, v in _data.iteritems():
+            data[k].extend(v)
+    data = uniq_by_key(data)
+    return data
 
 def get_tokens(text):
     mecab = MeCab()
@@ -82,11 +92,10 @@ def make_dict_and_save(pos_word_dict):
 
 comment_path = 'commtents/gochiusa/raw/'
 save_path = 'commtents/gochiusa/extracted/'
-date, vpos, text = load_all_comments(comment_path)
-d = {'date':date, 'vpos':vpos, 'text':text}
-for k, v in d.iteritems():np.save(save_path + k, v)
+data = load_all_comments(comment_path)
+for k, v in data.iteritems():np.save(save_path + k, v)
 
-tokens, pos_word_dict = get_tokens(text)
+tokens, pos_word_dict = get_tokens(data['text'])
 np.save(save_path + 'tokens', tokens)
 
 make_dict_and_save(pos_word_dict)

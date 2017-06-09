@@ -4,7 +4,6 @@
 import os
 import numpy as np
 import xml.etree.ElementTree as ET
-import datetime
 
 from natto import MeCab
 
@@ -17,7 +16,7 @@ def read_xml(path):
 def extract_data(root):
     d = {k:[] for k in ['date', 'no', 'vpos', 'text']}# unixtime, number, 1 / 100 sec
     for r in root:
-        if 'date' in r.attrib:
+        if not r.text == None:
             for k in d.keys():
                 if k == 'text':
                     d[k].append(r.text)
@@ -49,18 +48,17 @@ def get_tokens(text):
     tokens = []
     pos_word_dict = {}
     for t in text:
-        if not t == None:
-            res_raw = mecab.parse(t.encode('utf-8'))
-            res = [r.split('\t') for r in res_raw.split('\n')]
-            res = [r for r in res if len(r) == 2]
-            res = [[r[0], r[1].split(',')[0]] for r in res]
+        res_raw = mecab.parse(t.encode('utf-8'))
+        res = [r.split('\t') for r in res_raw.split('\n')]
+        res = [r for r in res if len(r) == 2]
+        res = [[r[0], r[1].split(',')[0]] for r in res]
 
-            for r in res:
-                if r[1] in pos_word_dict:
-                    pos_word_dict[r[1]].append(r[0])
-                else:
-                    pos_word_dict[r[1]] = [r[0]]
-                tokens.append(' '.join([r[0] for r in res]))
+        for r in res:
+            if r[1] in pos_word_dict:
+                pos_word_dict[r[1]].append(r[0])
+            else:
+                pos_word_dict[r[1]] = [r[0]]
+        tokens.append(' '.join([r[0] for r in res]))
     return tokens, pos_word_dict
 
 def make_dict(tokens=None, from_word_list=False, dict_count=None):
@@ -106,5 +104,6 @@ for s in dict_ordered_by_count.items()[:100]: print s[0], s[1]
 counts = [s[1] for s in dict_ordered_by_count.items()]
 total_word_num = sum(counts)
 
-# print datetime.datetime.fromtimestamp(min(date))
+import datetime
+print datetime.datetime.fromtimestamp(min(data['date']))
 

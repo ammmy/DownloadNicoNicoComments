@@ -14,14 +14,19 @@ def read_xml(path):
     return ET.fromstring(open(path, 'r').read())
 
 def extract_data(root):
-    d = {k:[] for k in ['date', 'no', 'vpos', 'text']}# unixtime, number, 1 / 100 sec
+    d = {k:[] for k in ['date', 'no', 'vpos', 'mail', 'text']}# unixtime, number, 1 / 100 sec, text stype, comment
     for r in root:
         if not r.text == None:
             for k in d.keys():
                 if k == 'text':
-                    d[k].append(r.text)
+                    _d = r.text
                 else:
-                    d[k].append(int(r.attrib[k])) 
+                    if not k in r.attrib:
+                        _d = None
+                    else:
+                        _d = r.attrib[k]
+                        if k in ['date', 'no', 'vpos']: _d = int(_d)
+                d[k].append(_d)
     return d
 
 def uniq_by_key(data, k='no'):
@@ -34,7 +39,7 @@ def uniq_by_key(data, k='no'):
 
 def load_all_comments(comment_path):
     comment_file_name = os.listdir(comment_path)
-    data = {k:[] for k in ['date', 'no', 'vpos', 'text']}
+    data = {k:[] for k in ['date', 'no', 'vpos', 'mail', 'text']}
     for name in comment_file_name:
         xml = read_xml(comment_path + name)
         _data = extract_data(xml)
@@ -97,6 +102,11 @@ tokens, pos_word_dict = get_tokens(data['text'])
 np.save(save_path + 'tokens', tokens)
 
 make_dict_and_save(pos_word_dict)
+
+from load_gochiusa_movie import *
+vpos = np.load('commtents/gochiusa/extracted/vpos.npy')
+frame = [movie.vpos_to_frame(p) for p in vpos]
+np.save(save_path + 'frame', frame)
 
 # check
 dict_ordered_by_count = np.load('commtents/gochiusa/extracted/dict/dict_ordered_by_count_名詞.npy')[None][0]

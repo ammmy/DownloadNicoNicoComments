@@ -41,7 +41,7 @@ WaybackTime='2114/04/16 12:00:00'
 xml_path = u'[out]comment\[1397552685]ご注文はうさぎですか？　第1羽「ひと目で、尋常でないもふもふだと見抜いたよ」.xml' # ask saccubus
 save_path = u'comments\\'
 
-WaybackTime='2015-04-16 20.26.53'.replace('-', '/').replace('.', ':') # sometime gets invalid WaybackTime message and abort, then try again reasigning WaybackTime by manual, and add some minutes
+# WaybackTime='2015-04-16 20.26.53'.replace('-', '/').replace('.', ':') # sometime gets invalid WaybackTime message and abort, then try again reasigning WaybackTime by manual, and add some minutes
 # first, download latest 1000 comments, here set WaybackTime just now or futur time
 download_coment(email, password, target_id, WaybackTime)
 
